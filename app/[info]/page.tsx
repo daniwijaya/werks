@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
 
 const content: Record<string, { title: string; body: string }> = {
   sources: {
@@ -131,7 +132,7 @@ export default async function InfoPage({ params }: { params: Promise<{ info: str
       <p className="eyebrow">WERKS · THE DETAILS</p>
       <h1>{page.title}<span className="accent-dot">.</span></h1>
       <p>{page.body}</p>
-      <Link href="/" className="text-link">Back home ↗</Link>
+      <Link href="/" className="text-link">Back home <ArrowUpRight size={14} aria-hidden="true" /></Link>
     </section>
   );
 }
