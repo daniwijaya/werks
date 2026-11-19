@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight, BriefcaseBusiness, Clock3, LayoutGrid, MapPin, Search } from "lucide-react";
 import { jobs } from "@/data/jobs";
 import { indonesiaCities } from "@/data/indonesia-cities";
@@ -54,7 +55,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
       </form>
       <div className="results-head">
         <span><strong>{found.length}</strong> {found.length === 1 ? "opportunity" : "opportunities"}</span>
-        <a href="/jobs">Clear filters <ArrowUpRight size={13} aria-hidden="true" /></a>
+        <Link href="/jobs">Clear filters <ArrowUpRight size={13} aria-hidden="true" /></Link>
       </div>
       {found.length ? (
         <div className="job-grid">{found.map(job => <JobCard key={job.id} job={job} />)}</div>
@@ -69,7 +70,7 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
           />
           <h2>No jobs found.</h2>
           <p>Try adjusting your search or filters to find the right opportunity.</p>
-          <a href="/jobs" className="load-more-button">Clear all filters</a>
+          <Link href="/jobs" className="load-more-button">Clear all filters</Link>
         </div>
       )}
     </section>
