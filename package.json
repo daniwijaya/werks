@@ -2,7 +2,38 @@
   "name": "werk-design-jobs",
   "version": "0.1.0",
   "private": true,
-  "scripts": { "dev": "next dev --turbopack", "build": "next build --turbopack", "start": "next start", "lint": "eslint .", "typecheck": "tsc --noEmit" },
-  "dependencies": { "next": "15.5.28", "react": "19.1.1", "react-dom": "19.1.1", "lucide-react": "^0.468.0" },
-  "devDependencies": { "@types/node": "^22.10.0", "@types/react": "^19.0.0", "@types/react-dom": "^19.0.0", "eslint": "^9.16.0", "eslint-config-next": "15.5.28", "typescript": "^5.7.2" }
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node --experimental-strip-types scripts/seed-sources.ts",
+    "verify:sources": "node --experimental-strip-types scripts/verify-source-endpoints.ts",
+    "sync:greenhouse": "node --experimental-strip-types scripts/sync-greenhouse.ts",
+    "smoke:greenhouse": "node --experimental-strip-types scripts/smoke-greenhouse.ts",
+    "sync:jobicy": "node --experimental-strip-types scripts/sync-jobicy.ts",
+    "smoke:jobicy": "node --experimental-strip-types scripts/smoke-jobicy.ts",
+    "test:aggregation": "node --experimental-strip-types --test tests/aggregation/*.test.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.4",
+    "lucide-react": "^0.468.0",
+    "next": "15.5.28",
+    "postgres": "^4.1.1",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "dotenv": "^18.0.10",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "15.5.28",
+    "typescript": "^5.7.2"
+  }
 }

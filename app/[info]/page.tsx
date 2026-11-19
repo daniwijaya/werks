@@ -107,7 +107,7 @@ function PrivacyPage() {
             <summary>8. Contact Us</summary>
             <div className="privacy-detail-body">
               <p>For questions about this Privacy Policy, contact:</p>
-              <address><strong>Dani Wijaya</strong><br />Creator of WERKS<br />Email: <a href="mailto:danyswijaya@gmail.com">danyswijaya@gmail.com</a><br />Website: <a href="https://www.daniwijaya.com/" target="_blank" rel="noreferrer">www.daniwijaya.com</a></address>
+              <address><strong>WERKS Indonesia</strong><br />Email: <a href="mailto:werks.indonesia@gmail.com">werks.indonesia@gmail.com</a></address>
             </div>
           </details>
         </div>

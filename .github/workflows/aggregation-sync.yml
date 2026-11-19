@@ -1,0 +1,32 @@
+name: WERKS job aggregation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 */6 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: werks-job-aggregation
+  cancel-in-progress: false
+
+jobs:
+  sync-approved-sources:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Sync approved Greenhouse sources
+        run: npm run sync:greenhouse
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Sync approved Jobicy source
+        run: npm run sync:jobicy
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

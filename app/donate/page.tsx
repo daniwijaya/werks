@@ -1,23 +1,5 @@
 import Image from "next/image";
-import { Landmark } from "lucide-react";
-
-const waysSupportHelps = [
-  {
-    number: "01",
-    title: "Keep WERKS running",
-    body: "Help cover the time and tools it takes to maintain the platform.",
-  },
-  {
-    number: "02",
-    title: "Make discovery better",
-    body: "Support improvements that make finding design opportunities easier.",
-  },
-  {
-    number: "03",
-    title: "Help an independent creator",
-    body: "Give me more room to build WERKS into a useful home for Indonesia’s design community.",
-  },
-];
+import { DonateContribution } from "@/components/donate-contribution";
 
 export default function DonatePage() {
   return (
@@ -36,23 +18,8 @@ export default function DonatePage() {
         </div>
       </div>
 
-      <div className="donate-support-grid">
-        {waysSupportHelps.map(item => (
-          <article className="donate-support-card" key={item.number}>
-            <span>{item.number}</span>
-            <h2>{item.title}</h2>
-            <p>{item.body}</p>
-          </article>
-        ))}
-      </div>
+      <DonateContribution />
 
-      <div className="donate-panel donate-coming-soon">
-        <div className="donate-panel-icon"><Landmark size={17} /></div>
-        <div>
-          <h2>Donations are in progress</h2>
-          <p>The donation feature is being prepared. Please check back soon.</p>
-        </div>
-      </div>
     </section>
   );
 }
