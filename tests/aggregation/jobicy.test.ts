@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fetchJobicyJobs, fetchJobicyStatuses, isJobicyListingUrl, mapJobicyJob } from "../../lib/aggregation/jobicy.ts";
+import { fetchJobicyJobs, fetchJobicyStatuses, isJobicyListingUrl, mapJobicyJob, jobicyRejectionReasons } from "../../lib/aggregation/jobicy.ts";
 
 const indonesiaJob = {
   id: 456,
@@ -55,6 +55,9 @@ test("Jobicy feed fetch applies verified filters, paginates, and deduplicates", 
   assert.equal(requests[1].searchParams.get("cursor"), "cursor-token");
   assert.equal(result.fetchedCount, 2);
   assert.equal(result.jobs.length, 2);
+  assert.equal(result.rawCount, 6);
+  assert.equal(result.duplicateCount, 4);
+  assert.equal(result.rejectedCount, 0);
 });
 
 test("Jobicy status requests batch IDs and return explicit statuses", async () => {
@@ -75,4 +78,23 @@ test("Jobicy status requests batch IDs and return explicit statuses", async () =
   assert.equal(calls[1].searchParams.get("ids"), "101");
   assert.equal(result.get("1"), "active");
   assert.equal(result.get("101"), "closed");
+});
+
+
+test("Jobicy reports geographic and title rejection reasons independently", () => {
+  assert.deepEqual(jobicyRejectionReasons({ ...indonesiaJob, jobGeo: "Australia, New Zealand" }), ["no_explicit_indonesia_location"]);
+  assert.deepEqual(jobicyRejectionReasons({ ...indonesiaJob, jobTitle: "Content Creator", jobGeo: "Philippines" }), ["title_not_design_role", "no_explicit_indonesia_location"]);
+  assert.ok(jobicyRejectionReasons({ ...indonesiaJob, id: "" }).includes("missing_identity"));
+});
+
+test("zero accepted Jobicy records is a successful fetch with explicit rejection counts", async () => {
+  const result = await fetchJobicyJobs({ minimumIntervalMs: 0, fetchImpl: async () => new Response(JSON.stringify({
+    jobs: [{ ...indonesiaJob, jobGeo: "Philippines" }], nextCursor: null,
+  })) });
+  assert.equal(result.fetchedCount, 1);
+  assert.equal(result.rawCount, 4);
+  assert.equal(result.duplicateCount, 3);
+  assert.equal(result.rejectedCount, 1);
+  assert.equal(result.jobs.length, 0);
+  assert.deepEqual(result.rejectionReasons, { no_explicit_indonesia_location: 1 });
 });

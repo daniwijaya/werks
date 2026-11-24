@@ -4,6 +4,8 @@ import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
 import { JobCard } from "@/components/job-card";
+import { matchesDiscipline } from "@/lib/filter-jobs";
+import { jobListingEmptyCopy } from "@/lib/job-listing-copy";
 import type { Job } from "@/types/job";
 
 const categories = ["All", "Product Design", "UI/UX Design", "UX Research", "Graphic Design", "Motion Design", "Illustration", "Others"];
@@ -13,7 +15,7 @@ export function HomeJobFeed({ jobs }: { jobs: Job[] }) {
   const [visibleCount, setVisibleCount] = useState(6);
   const section = useRef<HTMLElement>(null);
   const filtered = useMemo(
-    () => active === "All" ? jobs : active === "Others" ? [] : jobs.filter(job => job.designDisciplines.includes(active)),
+    () => active === "All" ? jobs : jobs.filter(job => matchesDiscipline(job, active)),
     [active, jobs],
   );
 
@@ -53,7 +55,7 @@ export function HomeJobFeed({ jobs }: { jobs: Job[] }) {
           </div>
           {visibleCount < filtered.length && (
             <div className="load-more-wrap">
-              <p>Showing {Math.min(visibleCount, filtered.length)} of {filtered.length} demo listings</p>
+            <p>Showing {Math.min(visibleCount, filtered.length)} of {filtered.length} live listings</p>
               <button type="button" className="load-more-button" onClick={() => setVisibleCount(count => count + 6)}>
                 Load more jobs <ChevronDown size={16} />
               </button>
@@ -69,10 +71,10 @@ export function HomeJobFeed({ jobs }: { jobs: Job[] }) {
             height={1317}
             sizes="(max-width: 700px) 70vw, 240px"
           />
-          <h2>No {active} jobs right now.</h2>
-          <p>Try another category or browse all design jobs to find your next opportunity.</p>
+          <h2>{jobListingEmptyCopy.title}</h2>
+          <p>{jobListingEmptyCopy.description}</p>
           <button type="button" className="load-more-button" onClick={() => selectCategory("All")}>
-            Show all jobs
+            {jobListingEmptyCopy.action}
           </button>
         </div>
       )}

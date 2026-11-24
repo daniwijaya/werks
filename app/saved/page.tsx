@@ -1,38 +1,24 @@
-"use client";
+import { loadPublicJobs } from "@/lib/jobs/public-jobs";
+import { SavedJobFeed } from "@/components/saved-job-feed";
 
-import Image from "next/image";
-import Link from "next/link";
-import { useSavedJobs } from "@/components/save-job-button";
-import { jobs } from "@/data/jobs";
-import { JobCard } from "@/components/job-card";
+export const dynamic = "force-dynamic";
 
-export default function SavedPage() {
-  const { saved } = useSavedJobs();
-  const list = jobs.filter(job => saved.includes(job.id));
-
-  return (
-    <section className="listing-page wrap">
-      <div className="page-heading">
-        <p className="eyebrow">YOUR PERSONAL SHORTLIST</p>
-        <h1>Saved jobs<span className="accent-dot">.</span></h1>
-        <p className="section-sub">Keep the possibilities you want to come back to.</p>
-      </div>
-      {list.length ? (
-        <div className="job-grid">{list.map(job => <JobCard key={job.id} job={job} />)}</div>
-      ) : (
-        <div className="empty-state">
-          <Image
-            src="/images/werk-empty-saved-jobs.png"
-            alt=""
-            width={1317}
-            height={1317}
-            sizes="(max-width: 700px) 70vw, 240px"
-          />
-          <h2>Your shortlist starts here.</h2>
-          <p>Save jobs that catch your eye and they’ll show up here.</p>
-          <Link className="button-secondary" href="/jobs">Explore jobs</Link>
+export default async function SavedPage() {
+  const result = await loadPublicJobs();
+  if (result.status === "error") {
+    return (
+      <section className="listing-page wrap">
+        <div className="page-heading">
+          <p className="eyebrow">YOUR PERSONAL SHORTLIST</p>
+          <h1>Saved jobs<span className="accent-dot">.</span></h1>
         </div>
-      )}
-    </section>
-  );
+        <div className="empty-state job-feed-error" role="alert">
+          <h2>Saved jobs are temporarily unavailable.</h2>
+          <p>We couldn’t retrieve current listings. Please try again shortly.</p>
+        </div>
+      </section>
+    );
+  }
+
+  return <SavedJobFeed jobs={result.jobs} />;
 }

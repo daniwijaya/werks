@@ -23,10 +23,38 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Sync approved Greenhouse sources
+        id: greenhouse
         run: npm run sync:greenhouse
+        continue-on-error: true
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
       - name: Sync approved Jobicy source
+        id: jobicy
         run: npm run sync:jobicy
+        continue-on-error: true
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Sync approved Remote OK source
+        id: remoteok
+        run: npm run sync:remoteok
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Sync approved company career-page sources
+        id: career-pages
+        run: npm run sync:career-pages
+        continue-on-error: true
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      - name: Report synchronization failures
+        if: always()
+        env:
+          GREENHOUSE_OUTCOME: ${{ steps.greenhouse.outcome }}
+          JOBICY_OUTCOME: ${{ steps.jobicy.outcome }}
+          REMOTEOK_OUTCOME: ${{ steps.remoteok.outcome }}
+          CAREER_PAGES_OUTCOME: ${{ steps.career-pages.outcome }}
+        run: |
+          if [ "$GREENHOUSE_OUTCOME" = "failure" ] || [ "$JOBICY_OUTCOME" = "failure" ] || [ "$REMOTEOK_OUTCOME" = "failure" ] || [ "$CAREER_PAGES_OUTCOME" = "failure" ]; then
+            echo "At least one source group failed; inspect the per-source sync logs."
+            exit 1
+          fi

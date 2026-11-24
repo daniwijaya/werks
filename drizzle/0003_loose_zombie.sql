@@ -1,0 +1,1 @@
+ALTER TABLE "job_sources" ALTER COLUMN "board_identifier" DROP NOT NULL;

@@ -1,9 +1,12 @@
 import { BriefcaseBusiness, Clock3, LayoutGrid, MapPin, Search } from "lucide-react";
 import Image from "next/image";
-import { jobs } from "@/data/jobs";
+import { Suspense } from "react";
 import { DropdownSelect } from "@/components/dropdown-select";
-import { HomeJobFeed } from "@/components/home-job-feed";
+import { LiveHomeJobFeed } from "@/components/live-home-job-feed";
 import { indonesiaCities } from "@/data/indonesia-cities";
+import { JobFeedState } from "@/components/job-feed-state";
+
+export const dynamic = "force-dynamic";
 
 const categories = ["All", "Product Design", "UI/UX Design", "UX Research", "Graphic Design", "Motion Design", "Illustration", "Others"];
 
@@ -41,6 +44,8 @@ export default function Home() {
         <button className="button-primary" type="submit">Search</button>
       </form>
     </section>
-    <HomeJobFeed jobs={jobs} />
+    <Suspense fallback={<JobFeedState state="loading" />}>
+      <LiveHomeJobFeed />
+    </Suspense>
   </>;
 }

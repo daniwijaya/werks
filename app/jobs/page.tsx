@@ -1,15 +1,18 @@
 import Image from "next/image";
+import { jobListingEmptyCopy } from "@/lib/job-listing-copy";
 import Link from "next/link";
 import { ArrowUpRight, BriefcaseBusiness, Clock3, LayoutGrid, MapPin, Search } from "lucide-react";
-import { jobs } from "@/data/jobs";
 import { indonesiaCities } from "@/data/indonesia-cities";
 import { filterJobs } from "@/lib/filter-jobs";
+import { loadPublicJobs } from "@/lib/jobs/public-jobs";
 import { JobCard } from "@/components/job-card";
 import { DropdownSelect } from "@/components/dropdown-select";
 
 const disciplines = ["Product Design", "UI/UX Design", "UX Research", "UX Writing", "Graphic Design", "Brand Design", "Motion Design", "Illustration", "Industrial Design", "Others"];
 const workModes = ["Remote", "Hybrid", "On-site"];
 const employmentTypes = ["Full-time", "Part-time", "Contract", "Freelance"];
+
+export const dynamic = "force-dynamic";
 
 export default async function JobsPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
@@ -21,7 +24,8 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
     mode: value("mode"),
     type: value("type"),
   };
-  const found = filterJobs(jobs, filters);
+  const result = await loadPublicJobs();
+  const found = result.status === "success" ? filterJobs(result.jobs, filters) : [];
 
   return (
     <section className="listing-page wrap">
@@ -54,10 +58,15 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
         <button className="button-primary" type="submit">Search</button>
       </form>
       <div className="results-head">
-        <span><strong>{found.length}</strong> {found.length === 1 ? "opportunity" : "opportunities"}</span>
+        <span>{result.status === "error" ? "Listings unavailable" : <><strong>{found.length}</strong> {found.length === 1 ? "opportunity" : "opportunities"}</>}</span>
         <Link href="/jobs">Clear filters <ArrowUpRight size={13} aria-hidden="true" /></Link>
       </div>
-      {found.length ? (
+      {result.status === "error" ? (
+        <div className="empty-state job-feed-error" role="alert">
+          <h2>Job listings are temporarily unavailable.</h2>
+          <p>We couldn’t retrieve current listings. Please try again shortly.</p>
+        </div>
+      ) : found.length ? (
         <div className="job-grid">{found.map(job => <JobCard key={job.id} job={job} />)}</div>
       ) : (
         <div className="empty-state">
@@ -68,9 +77,9 @@ export default async function JobsPage({ searchParams }: { searchParams: Promise
             height={1317}
             sizes="(max-width: 700px) 70vw, 240px"
           />
-          <h2>No jobs found.</h2>
-          <p>Try adjusting your search or filters to find the right opportunity.</p>
-          <Link href="/jobs" className="load-more-button">Clear all filters</Link>
+          <h2>{jobListingEmptyCopy.title}</h2>
+          <p>{jobListingEmptyCopy.description}</p>
+          <Link href="/jobs" className="load-more-button">{jobListingEmptyCopy.action}</Link>
         </div>
       )}
     </section>
