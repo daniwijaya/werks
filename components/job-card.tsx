@@ -1,6 +1,7 @@
 import { ArrowUpRight, MapPin } from "lucide-react";
 import type { Job } from "@/types/job";
 import { SaveJobButton } from "@/components/save-job-button";
+import { getJobSourcePresentation } from "@/lib/job-attribution";
 
 export function JobCard({ job }: { job: Job }) {
   const published = job.publishedAt
@@ -10,6 +11,7 @@ export function JobCard({ job }: { job: Job }) {
       )
     : null;
   const city = job.location.replace(/,\s*Indonesia$/i, "");
+  const sourcePresentation = getJobSourcePresentation(job);
 
   return (
     <article className="job-card">
@@ -21,7 +23,7 @@ export function JobCard({ job }: { job: Job }) {
       <p className="company-name">{job.companyName}</p>
       <h3>{job.title}</h3>
       <div className="job-meta">
-        <span><MapPin size={14} />{city}</span>
+        {city && <span><MapPin size={14} />{city}</span>}
         {job.workMode && <span>{job.workMode}</span>}
         {job.employmentType && <span>{job.employmentType}</span>}
       </div>
@@ -31,9 +33,17 @@ export function JobCard({ job }: { job: Job }) {
         </div>
         {published && <time className="published-time" dateTime={job.publishedAt} suppressHydrationWarning>{published}</time>}
       </div>
-      <a className="source-cta" href={job.sourceUrl} target="_blank" rel="noreferrer">
-        Apply on original source <ArrowUpRight size={15} />
+      {sourcePresentation.attributionText && (
+        <p className="job-attribution">{sourcePresentation.attributionText}</p>
+      )}
+      <a className="source-cta" href={sourcePresentation.listingLink.href} target="_blank" rel="noopener noreferrer">
+        {sourcePresentation.listingLink.label} <ArrowUpRight size={15} />
       </a>
+      {sourcePresentation.applicationLink && (
+        <a className="source-cta source-application-cta" href={sourcePresentation.applicationLink.href} target="_blank" rel="noopener noreferrer">
+          {sourcePresentation.applicationLink.label} <ArrowUpRight size={15} />
+        </a>
+      )}
     </article>
   );
 }

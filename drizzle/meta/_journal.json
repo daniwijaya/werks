@@ -15,6 +15,48 @@
       "when": 1795082802483,
       "tag": "0001_overjoyed_hellion",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795138350083,
+      "tag": "0002_lying_havok",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795139543653,
+      "tag": "0003_loose_zombie",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795142080390,
+      "tag": "0004_hot_hannibal_king",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795143654763,
+      "tag": "0005_simple_phalanx",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795393200000,
+      "tag": "0006_remoteok_source_type",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795496653820,
+      "tag": "0007_lively_hulk",
+      "breakpoints": true
     }
   ]
 }

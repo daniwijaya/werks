@@ -7,9 +7,9 @@ dotenv.config({ path: [".env.local", ".env"] });
 async function main() {
   const { client } = getDatabase();
   try {
-    const results = await syncApprovedJobicySources();
+    const results = await syncApprovedJobicySources({ dryRun: process.argv.includes("--dry-run") });
     if (!results.length) {
-      console.log("No active, permission-approved Jobicy sources. No jobs were changed.");
+      console.log("No eligible, compliance-approved Jobicy sources. No jobs were changed.");
       return;
     }
     for (const result of results) {

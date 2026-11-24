@@ -1,4 +1,4 @@
-import { classifyDesignCategories, isIndonesiaOpportunity, normalizeText, parseDate, validJobUrl } from "./normalize.ts";
+import { classifyDesignCategories, isIndonesiaOpportunity, normalizeCompanyName, normalizeJobUrl, normalizeText, parseDate, validJobUrl } from "./normalize.ts";
 import type { NormalizedJob } from "./types.ts";
 
 const JOBICY_API = "https://jobicy.com/api/jobs";
@@ -39,27 +39,36 @@ export function isJobicyListingUrl(value: string): boolean {
   const url = new URL(value);
   return url.hostname === "jobicy.com" && url.pathname.startsWith("/jobs/");
 }
-export function mapJobicyJob(job: JobicyJob): NormalizedJob | null {
-  const title = job.jobTitle?.trim();
-  const companyName = job.companyName?.trim();
-  const listingUrl = job.url?.trim();
-  if (!title || !companyName || !listingUrl || !isJobicyListingUrl(listingUrl)) return null;
+export function jobicyRejectionReasons(job: JobicyJob): string[] {
+  const reasons: string[] = [];
+  if (!job.id || !job.jobTitle?.trim() || !job.companyName?.trim()) reasons.push("missing_identity");
+  if (!job.url || !isJobicyListingUrl(job.url.trim())) reasons.push("invalid_original_url");
+  if (!/\b(design|designer|creative|art direction)\b/i.test(job.jobTitle ?? "")) reasons.push("title_not_design_role");
+  if (!classifyDesignCategories([job.jobTitle, ...(job.jobIndustry ?? [])].join(" ")).length) reasons.push("unclassified_design_role");
+  if (!isIndonesiaOpportunity(job.jobGeo)) reasons.push("no_explicit_indonesia_location");
+  return reasons;
+}
 
-  if (!/\b(design|designer|creative|art direction)\b/i.test(title)) return null;
+export function mapJobicyJob(job: JobicyJob): NormalizedJob | null {
+  if (jobicyRejectionReasons(job).length) return null;
+  const title = job.jobTitle!.trim();
+  const companyName = job.companyName!.trim();
+  const listingUrl = job.url!.trim();
   const categories = classifyDesignCategories([title, ...(job.jobIndustry ?? [])].join(" "));
   const locationText = job.jobGeo?.trim() || null;
-  if (categories.length === 0 || !isIndonesiaOpportunity(locationText)) return null;
 
   return {
     externalId: String(job.id),
     title,
     normalizedTitle: normalizeText(title),
     companyName,
-    normalizedCompanyName: normalizeText(companyName),
+    normalizedCompanyName: normalizeCompanyName(companyName),
     sourceUrl: listingUrl,
+    canonicalUrl: normalizeJobUrl(listingUrl),
     // The public Jobicy API requires apply links to remain on the Jobicy listing.
     applicationUrl: listingUrl,
     description: null,
+    department: null,
     locationText,
     countryCode: "ID",
     employmentType: job.jobType?.length ? job.jobType.join(", ") : null,
@@ -70,6 +79,7 @@ export function mapJobicyJob(job: JobicyJob): NormalizedJob | null {
     salaryInterval: job.salaryPeriod ?? null,
     experienceLevel: job.jobLevel ?? null,
     originalPostedAt: parseDate(job.pubDate),
+    expiresAt: null,
     sourceUpdatedAt: null,
     categories,
   };
@@ -81,11 +91,12 @@ export async function fetchJobicyJobs(
     delay?: (milliseconds: number) => Promise<void>;
     minimumIntervalMs?: number;
   } = {},
-): Promise<{ endpointUrl: string; fetchedCount: number; jobs: NormalizedJob[] }> {
+): Promise<{ endpointUrl: string; fetchedCount: number; rawCount: number; duplicateCount: number; rejectedCount: number; rejectionReasons: Record<string, number>; jobs: NormalizedJob[] }> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const delay = options.delay ?? ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
   const minimumIntervalMs = options.minimumIntervalMs ?? 1_050;
   const collected = new Map<string, JobicyJob>();
+  let rawCount = 0;
   let lastRequestAt = 0;
 
   async function getPage(url: URL): Promise<JobicyResponse> {
@@ -127,13 +138,19 @@ export async function fetchJobicyJobs(
       if (cursor) url.searchParams.set("cursor", cursor);
 
       const payload = await getPage(url);
+      rawCount += payload.jobs!.length;
       for (const job of payload.jobs ?? []) collected.set(String(job.id), job);
       cursor = payload.nextCursor ?? null;
     } while (cursor);
   }
 
   const jobs = [...collected.values()].map(mapJobicyJob).filter((job): job is NormalizedJob => job !== null);
-  return { endpointUrl: JOBICY_API, fetchedCount: collected.size, jobs };
+  const rejectionReasons: Record<string, number> = {};
+  for (const job of collected.values()) {
+    for (const reason of jobicyRejectionReasons(job)) rejectionReasons[reason] = (rejectionReasons[reason] ?? 0) + 1;
+  }
+  return { endpointUrl: JOBICY_API, fetchedCount: collected.size, rawCount, duplicateCount: rawCount - collected.size,
+    rejectedCount: collected.size - jobs.length, rejectionReasons, jobs };
 }
 
 export async function fetchJobicyStatuses(

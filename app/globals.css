@@ -205,3 +205,10 @@ html,body{overflow-x:clip}.hero-art{right:0}
 .contribution-summary .contribution-submit{width:auto;min-width:230px;margin:0}
 @media(min-width:701px){.donate-page{padding-bottom:48px}.donate-page .contribution-section{margin-bottom:0}}
 @media(max-width:700px){.contribution-amount-row{grid-template-columns:minmax(0,1fr);gap:16px}.contribution-method-list{grid-template-columns:minmax(0,1fr)}.contribution-summary{flex-direction:column;align-items:flex-start;gap:0}.contribution-summary .contribution-submit{width:100%;min-width:0;margin-top:20px}}
+.job-attribution{margin:11px 0 -5px;color:var(--muted);font-size:10px;line-height:1.4}
+.source-application-cta{margin-top:8px}
+.job-feed-loading{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.job-feed-loading span{height:190px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(100deg,var(--surface) 25%,#1c1c25 45%,var(--surface) 65%);background-size:220% 100%;animation:job-feed-pulse 1.4s ease-in-out infinite}
+.job-feed-error{border-style:solid;border-color:#554052}
+@keyframes job-feed-pulse{to{background-position-x:-220%}}
+@media(max-width:700px){.job-feed-loading{grid-template-columns:1fr}.job-feed-loading span{height:160px}}

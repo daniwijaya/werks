@@ -9,7 +9,7 @@ async function main() {
   try {
     const results = await syncApprovedGreenhouseSources();
     if (!results.length) {
-      console.log("No active, permission-approved Greenhouse sources. No jobs were changed.");
+      console.log("No active, compliance-approved Greenhouse sources. No jobs were changed.");
       return;
     }
     for (const result of results) {

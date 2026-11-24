@@ -1,4 +1,4 @@
-import { classifyDesignCategories, isIndonesiaOpportunity, normalizeText, normalizeWorkArrangement, parseDate, validJobUrl } from "./normalize.ts";
+import { classifyDesignCategories, isIndonesiaOpportunity, normalizeCompanyName, normalizeJobUrl, normalizeText, normalizeWorkArrangement, parseDate, validJobUrl } from "./normalize.ts";
 import type { NormalizedJob } from "./types.ts";
 
 export type GreenhouseJob = {
@@ -40,11 +40,13 @@ export function mapGreenhouseJob(job: GreenhouseJob, config: GreenhouseSourceCon
     title,
     normalizedTitle: normalizeText(title),
     companyName: config.companyName,
-    normalizedCompanyName: normalizeText(config.companyName),
+    normalizedCompanyName: normalizeCompanyName(config.companyName),
     sourceUrl,
+    canonicalUrl: normalizeJobUrl(sourceUrl),
     applicationUrl: null,
     // Greenhouse only provides the full post body when `content=true`; we avoid copying it unless usage is approved.
     description: null,
+    department: job.departments?.map((department) => department.name?.trim()).filter(Boolean).join(", ") || null,
     locationText,
     countryCode: "ID",
     employmentType: null,
@@ -55,6 +57,7 @@ export function mapGreenhouseJob(job: GreenhouseJob, config: GreenhouseSourceCon
     salaryInterval: null,
     experienceLevel: null,
     originalPostedAt: parseDate(job.first_published),
+    expiresAt: null,
     sourceUpdatedAt: parseDate(job.updated_at),
     categories,
   };
