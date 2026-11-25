@@ -21,7 +21,8 @@
     "sync:remoteok": "node --experimental-strip-types scripts/sync-remoteok.ts",
     "sync:career-pages": "node --experimental-strip-types scripts/sync-career-pages.ts",
     "smoke:jobicy": "node --experimental-strip-types scripts/smoke-jobicy.ts",
-    "test:aggregation": "node --experimental-strip-types --test tests/aggregation/*.test.ts"
+    "test:aggregation": "node --experimental-strip-types --test tests/aggregation/*.test.ts",
+    "test:community-ui": "node --experimental-strip-types --test tests/community-feed.test.ts"
   },
   "dependencies": {
     "cheerio": "^1.2.0",
